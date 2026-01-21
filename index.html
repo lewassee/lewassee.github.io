@@ -7,179 +7,217 @@
     <title>ScadaHelpBot</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: {
-                        brand: {
-                            blue: '#3b82f6',
-                            dark: '#1e293b',
-                            bg: '#4b5563'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
     <style>
         :root {
-            --tg-viewport-height: 100vh;
+            --bg-top: #374151;
+            --bg-mid: #4b5563;
+            --bg-bottom: #9ca3af;
+        }
+
+        * {
+            -webkit-tap-highlight-color: transparent;
+            box-sizing: border-box;
         }
 
         body {
-            background: #4b5563; /* Цвет верхней части */
-            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-mid);
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Фиксируем body для плавного внутреннего скролла */
             height: 100vh;
-            -webkit-font-smoothing: antialiased;
         }
 
-        /* Плавный градиент как на скрине */
-        .hero-gradient {
-            background: linear-gradient(180deg, #374151 0%, #4b5563 40%, #9ca3af 100%);
+        /* Эффект жидкого стекла для шапки */
+        .glass-header {
+            background: rgba(30, 41, 59, 0.45); /* Темный полупрозрачный фон */
+            backdrop-filter: blur(12px) saturate(160%);
+            -webkit-backdrop-filter: blur(12px) saturate(160%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
-        /* Скругление основной белой области */
-        .content-card {
+        /* Тот самый градиент фона */
+        .hero-section {
+            background: linear-gradient(180deg, var(--bg-top) 0%, var(--bg-mid) 40%, var(--bg-bottom) 100%);
+            min-height: 45vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding-top: 60px;
+        }
+
+        /* Белая воздушная карта */
+        .main-container {
+            background: #ffffff;
             border-top-left-radius: 40px;
             border-top-right-radius: 40px;
-            background: #ffffff;
-            box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.1);
+            margin-top: -40px;
+            min-height: 60vh;
+            padding: 40px 24px 120px 24px;
+            box-shadow: 0 -15px 35px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 10;
         }
 
-        /* Плавность скролла и переходов */
-        .smooth-scroll {
-            scroll-behavior: smooth;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        /* Кастомный переключатель (Оборудование / Документация) */
+        /* Плавные табы */
         .tab-switcher {
             background: #f1f5f9;
             border-radius: 100px;
-            padding: 4px;
+            padding: 6px;
+            display: flex;
+            gap: 4px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
         }
 
-        .tab-item {
-            padding: 8px 24px;
+        .tab-btn {
+            flex: 1;
+            padding: 10px 16px;
             border-radius: 100px;
             font-size: 14px;
             font-weight: 600;
-            transition: all 0.2s ease-in-out;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #64748b;
         }
 
-        .tab-item.active {
+        .tab-btn.active {
             background: #ffffff;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             color: #1e293b;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
-        /* Убираем дерганье при фокусе */
-        input:focus {
-            outline: none;
+        /* Скролл */
+        .scrollable-content {
+            height: 100vh;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+        .scrollable-content::-webkit-scrollbar { display: none; }
+
+        /* Анимации появления */
+        .fade-up {
+            animation: fadeUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
         }
 
-        #input-bar {
-            transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
-            padding-bottom: env(safe-area-inset-bottom, 12px);
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Инпут-бар */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 16px 20px calc(16px + env(safe-area-inset-bottom));
+            z-index: 100;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
     </style>
 </head>
 
-<body class="flex flex-col text-slate-900">
+<body>
 
-    <header class="fixed top-0 left-0 right-0 z-50 bg-slate-900/40 backdrop-blur-md border-b border-white/5">
-        <div class="px-5 py-3 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                    <span class="text-slate-900 font-black text-lg">S</span>
-                </div>
+    <header class="fixed top-0 left-0 right-0 z-[110] px-4 pt-1">
+        <div class="glass-header flex items-center justify-between px-5 py-3.5">
+            <div class="flex items-center">
+                <img src="logo-short-white.png" alt="Logo" class="h-6 w-auto">
             </div>
-            <button class="text-white/80 hover:text-white">
-                <i class="fa-solid fa-bars text-xl"></i>
-            </button>
+
+            <div class="flex items-center gap-5 text-white/70">
+                <button class="hover:text-white transition-colors"><i class="fa-solid fa-phone-flip text-[13px]"></i></button>
+                <button class="hover:text-white transition-colors"><i class="fa-solid fa-magnifying-glass text-[13px]"></i></button>
+                <button class="hover:text-white transition-colors"><i class="fa-solid fa-globe text-[13px]"></i></button>
+                <button class="hover:text-white transition-colors"><i class="fa-solid fa-bars text-lg"></i></button>
+            </div>
         </div>
     </header>
 
-    <main class="flex-1 overflow-y-auto smooth-scroll hero-gradient" id="scroll-container">
-        
-        <div class="pt-24 pb-12 px-8 text-center">
-            <nav class="flex justify-center items-center gap-2 text-[10px] font-bold text-white/60 uppercase tracking-widest mb-6">
+    <div class="scrollable-content" id="main-scroll">
+        <div class="hero-section">
+            <div class="fade-up flex items-center gap-2 text-[10px] font-bold text-white/50 uppercase tracking-[0.2em] mb-4">
                 <span>Главная</span>
-                <i class="fa-solid fa-chevron-right text-[8px]"></i>
-                <span class="text-white">Чат-Бот</span>
-            </nav>
-
-            <h1 class="text-3xl font-bold text-white mb-4 leading-tight tracking-tight">
+                <i class="fa-solid fa-chevron-right text-[7px] mt-[1px]"></i>
+                <span class="text-white/90">Чат-Бот</span>
+            </div>
+            
+            <h1 class="fade-up [animation-delay:100ms] text-[30px] font-bold text-white leading-tight mb-4 px-6">
                 Интеллектуальный<br>цифровой помощник
             </h1>
-            <p class="text-sm text-white/80 max-w-[280px] mx-auto leading-relaxed">
+            <p class="fade-up [animation-delay:200ms] text-[15px] text-white/70 max-w-[300px] leading-relaxed">
                 Отвечу на вопросы по оборудованию и ПО, подберу документацию.
             </p>
         </div>
 
-        <div class="content-card min-h-screen px-6 pt-10 pb-32">
-            <div class="flex justify-center mb-8">
-                <div class="tab-switcher flex w-full max-w-sm">
-                    <button class="tab-item active flex-1">Оборудование</button>
-                    <button class="tab-item flex-1 text-slate-400">Документация</button>
+        <main class="main-container">
+            <div class="max-w-xs mx-auto mb-10 fade-up [animation-delay:300ms]">
+                <div class="tab-switcher">
+                    <button class="tab-btn active">Оборудование</button>
+                    <button class="tab-btn">Документация</button>
                 </div>
             </div>
 
-            <div class="max-w-md mx-auto">
-                <div class="bg-white border border-slate-100 rounded-[24px] p-5 flex gap-4 shadow-sm hover:shadow-md transition-shadow duration-300">
-                    <div class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-robot text-slate-400 text-xl"></i>
+            <div class="max-w-md mx-auto fade-up [animation-delay:400ms]">
+                <div class="flex items-center gap-4 bg-white border border-slate-50 rounded-[28px] p-5 shadow-[0_10px_30px_rgba(0,0,0,0.03)]">
+                    <div class="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-robot text-slate-300 text-2xl"></i>
                     </div>
                     <div>
-                        <h3 class="font-bold text-slate-900 text-base mb-1">СкадаСистемы</h3>
-                        <p class="text-sm text-slate-500 leading-relaxed">
-                            Здравствуйте! Чем я могу помочь вам сегодня?
-                        </p>
+                        <h3 class="font-bold text-slate-900 text-[16px]">СкадаСистемы</h3>
+                        <p class="text-[14px] text-slate-500 mt-0.5">Здравствуйте! Чем я могу помочь вам сегодня?</p>
                     </div>
                 </div>
             </div>
-        </div>
-    </main>
+        </main>
+    </div>
 
-    <div id="input-bar" class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-slate-100 p-4 z-50">
-        <div class="max-w-xl mx-auto flex items-center gap-3">
-            <div class="flex-1 bg-slate-50 rounded-2xl px-5 py-3.5 border border-slate-100">
-                <input type="text" 
-                       id="user-input"
-                       class="w-full bg-transparent text-[15px] placeholder:text-slate-400" 
-                       placeholder="Ваш запрос..."
-                       autocomplete="off">
+    <div class="bottom-nav" id="bottom-bar">
+        <div class="max-w-xl mx-auto">
+            <div class="flex items-center gap-3">
+                <div class="flex-1 bg-slate-100/80 border border-slate-100 rounded-[20px] px-5 py-3.5">
+                    <input type="text" id="user-input" 
+                           placeholder="Ваш запрос..." 
+                           class="w-full bg-transparent border-none text-[16px] placeholder:text-slate-400 font-medium focus:ring-0 outline-none">
+                </div>
+                <button class="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-[0_8px_16px_rgba(37,99,235,0.3)] active:scale-90 transition-transform">
+                    <i class="fa-solid fa-arrow-up"></i>
+                </button>
             </div>
-            <button id="send-btn" class="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 active:scale-90 transition-transform duration-150">
-                <i class="fa-solid fa-arrow-up text-lg"></i>
-            </button>
+            <div class="text-center mt-4">
+                <span class="text-[10px] text-slate-300 font-bold uppercase tracking-widest">@ScadaHelpBot</span>
+            </div>
         </div>
     </div>
 
     <script>
+        const scrollContainer = document.getElementById('main-scroll');
+        const bottomBar = document.getElementById('bottom-bar');
         const input = document.getElementById('user-input');
-        const inputBar = document.getElementById('input-bar');
-        const scrollContainer = document.getElementById('scroll-container');
 
-        // Умная работа с клавиатурой для плавности
+        // Плавная обработка клавиатуры
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', () => {
-                const offset = window.innerHeight - window.visualViewport.height;
-                if (offset > 0) {
-                    // Поднимаем панель ввода
-                    inputBar.style.transform = `translateY(-${offset}px)`;
-                    // Прокручиваем контент
-                    setTimeout(() => {
-                        scrollContainer.scrollTop = scrollContainer.scrollHeight;
-                    }, 50);
+                const diff = window.innerHeight - window.visualViewport.height;
+                if (diff > 50) {
+                    bottomBar.style.transform = `translateY(-${diff}px)`;
                 } else {
-                    inputBar.style.transform = `translateY(0)`;
+                    bottomBar.style.transform = `translateY(0)`;
                 }
             });
         }
@@ -188,20 +226,6 @@
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
         window.Telegram.WebApp.setHeaderColor('#374151');
-
-        // Плавная анимация появления контента
-        document.addEventListener('DOMContentLoaded', () => {
-            document.querySelectorAll('.content-card > *').forEach((el, i) => {
-                el.style.opacity = '0';
-                el.style.transform = 'translateY(10px)';
-                el.style.transition = 'all 0.4s ease-out';
-                setTimeout(() => {
-                    el.style.opacity = '1';
-                    el.style.transform = 'translateY(0)';
-                }, 100 * i);
-            });
-        });
     </script>
 </body>
-
 </html>
