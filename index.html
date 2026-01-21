@@ -3,248 +3,204 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>СкадаСистемы</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>ScadaHelpBot</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-    <!-- Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        sky: {
-                            500: '#0ea5e9',
-                        },
-                        slate: {
-                            850: '#1e293b', // Custom dark
-                            900: '#0f172a',
+                        brand: {
+                            blue: '#3b82f6',
+                            dark: '#1e293b',
+                            bg: '#4b5563'
                         }
-                    },
-                    keyframes: {
-                        shimmer: {
-                            '0%': { transform: 'translateX(-100%)' },
-                            '100%': { transform: 'translateX(100%)' }
-                        },
-                        'fade-in-up': {
-                            '0%': { opacity: '0', transform: 'translateY(10px)' },
-                            '100%': { opacity: '1', transform: 'translateY(0)' },
-                        }
-                    },
-                    animation: {
-                        'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
                     }
                 }
             }
         }
     </script>
+
     <style>
+        :root {
+            --tg-viewport-height: 100vh;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #ffffff;
-            overscroll-behavior: none;
+            background: #4b5563; /* Цвет верхней части */
+            overflow: hidden;
+            height: 100vh;
+            -webkit-font-smoothing: antialiased;
         }
 
-        ::-webkit-scrollbar {
-            display: none;
+        /* Плавный градиент как на скрине */
+        .hero-gradient {
+            background: linear-gradient(180deg, #374151 0%, #4b5563 40%, #9ca3af 100%);
         }
 
-        /* Fix IOS Input Zoom & Scroll */
-        input,
-        textarea,
-        button,
-        select,
-        a {
-            -webkit-tap-highlight-color: transparent;
+        /* Скругление основной белой области */
+        .content-card {
+            border-top-left-radius: 40px;
+            border-top-right-radius: 40px;
+            background: #ffffff;
+            box-shadow: 0 -10px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
-        /* Smoother transitions */
-        .smooth-transition {
-            will-change: transform, opacity;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        /* Плавность скролла и переходов */
+        .smooth-scroll {
+            scroll-behavior: smooth;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Кастомный переключатель (Оборудование / Документация) */
+        .tab-switcher {
+            background: #f1f5f9;
+            border-radius: 100px;
+            padding: 4px;
+        }
+
+        .tab-item {
+            padding: 8px 24px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .tab-item.active {
+            background: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            color: #1e293b;
+        }
+
+        /* Убираем дерганье при фокусе */
+        input:focus {
+            outline: none;
+        }
+
+        #input-bar {
+            transition: transform 0.2s cubic-bezier(0.2, 0, 0, 1);
+            padding-bottom: env(safe-area-inset-bottom, 12px);
         }
     </style>
 </head>
 
-<body class="bg-white min-h-[100dvh] relative selection:bg-blue-200 overflow-hidden flex flex-col">
+<body class="flex flex-col text-slate-900">
 
-    <!-- Compact Header (No Icons, Minimized) -->
-    <header class="fixed top-3 left-1/2 -translate-x-1/2 w-[95%] max-w-[600px] z-50">
-        <div
-            class="relative group rounded-2xl border border-white/10 bg-slate-800/90 backdrop-blur-xl shadow-lg overflow-hidden">
-            <!-- Subtle shimmer -->
-            <div
-                class="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_3s_infinite] bg-gradient-to-r from-transparent via-white/5 to-transparent z-0 pointer-events-none">
-            </div>
-
-            <div class="relative z-10 px-4 py-2.5 flex items-center justify-between text-white">
-                <!-- Logo -->
-                <div class="flex items-center gap-2">
-                    <img src="logo-short-white.png" alt="СкадаСистемы" class="h-5 w-auto object-contain">
+    <header class="fixed top-0 left-0 right-0 z-50 bg-slate-900/40 backdrop-blur-md border-b border-white/5">
+        <div class="px-5 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+                    <span class="text-slate-900 font-black text-lg">S</span>
                 </div>
-
-                <!-- Simple Menu Icon Only -->
-                <button class="text-white/80 hover:text-white transition-colors">
-                    <i class="fa-solid fa-bars text-sm"></i>
-                </button>
             </div>
+            <button class="text-white/80 hover:text-white">
+                <i class="fa-solid fa-bars text-xl"></i>
+            </button>
         </div>
     </header>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 overflow-y-auto relative w-full pb-20 no-scrollbar" id="main-scroll">
+    <main class="flex-1 overflow-y-auto smooth-scroll hero-gradient" id="scroll-container">
+        
+        <div class="pt-24 pb-12 px-8 text-center">
+            <nav class="flex justify-center items-center gap-2 text-[10px] font-bold text-white/60 uppercase tracking-widest mb-6">
+                <span>Главная</span>
+                <i class="fa-solid fa-chevron-right text-[8px]"></i>
+                <span class="text-white">Чат-Бот</span>
+            </nav>
 
-        <!-- Hero Section (Metallic Gray Gradient - No Image) -->
-        <section
-            class="relative h-[45vh] min-h-[350px] w-full flex items-center justify-center bg-gradient-to-b from-slate-700 via-gray-400 to-white">
-            <div class="absolute inset-0 z-0">
-                <!-- No Image - Just Gradient -->
-                <div class="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent opacity-90">
+            <h1 class="text-3xl font-bold text-white mb-4 leading-tight tracking-tight">
+                Интеллектуальный<br>цифровой помощник
+            </h1>
+            <p class="text-sm text-white/80 max-w-[280px] mx-auto leading-relaxed">
+                Отвечу на вопросы по оборудованию и ПО, подберу документацию.
+            </p>
+        </div>
+
+        <div class="content-card min-h-screen px-6 pt-10 pb-32">
+            <div class="flex justify-center mb-8">
+                <div class="tab-switcher flex w-full max-w-sm">
+                    <button class="tab-item active flex-1">Оборудование</button>
+                    <button class="tab-item flex-1 text-slate-400">Документация</button>
                 </div>
             </div>
 
-            <div class="relative z-10 container px-6 text-center mt-8">
-                <!-- Breadcrumbs: Just Chat-Bot -->
-                <div
-                    class="mb-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 mx-auto animate-fade-in-up">
-                    <span
-                        class="text-white/90 text-[10px] font-bold uppercase tracking-widest text shadow-sm">Чат-Бот</span>
-                </div>
-
-                <h1
-                    class="text-3xl font-bold text-white leading-tight mb-3 animate-fade-in-up delay-100 drop-shadow-xl tracking-tight">
-                    Интеллектуальный<br>цифровой помощник
-                </h1>
-
-                <p
-                    class="text-sm text-white/90 max-w-xs mx-auto leading-relaxed animate-fade-in-up delay-200 font-medium drop-shadow-md">
-                    Отвечу на вопросы по оборудованию и ПО.
-                </p>
-            </div>
-        </section>
-
-        <!-- Content Section (Merged) -->
-        <section class="relative bg-white -mt-8 rounded-t-[2.5rem] z-20 px-4 pt-10 pb-6 min-h-[50vh]"
-            onclick="dismissKeyboard(event)">
-            <!-- Decorative Line -->
-            <div class="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-8"></div>
-
-            <div class="max-w-xl mx-auto space-y-6">
-
-                <!-- Single Section Title -->
-                <div class="flex items-center gap-3 mb-4">
-                    <div class="h-8 w-1 bg-blue-600 rounded-full"></div>
-                    <h2 class="text-lg font-bold text-slate-900">База знаний</h2>
-                </div>
-
-                <!-- Chat Area -->
-                <div id="messages-container" class="space-y-4">
-                    <!-- AI Message -->
-                    <div class="flex items-start gap-3 animate-fade-in-up">
-                        <div
-                            class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/20 text-white">
-                            <i class="fa-solid fa-robot text-xs"></i>
-                        </div>
-                        <div
-                            class="bg-gray-50 border border-gray-100 p-4 rounded-2xl rounded-tl-none shadow-sm text-sm text-slate-700 leading-relaxed max-w-[85%]">
-                            Здравствуйте! Я готов помочь вам с подбором решений.
-                        </div>
+            <div class="max-w-md mx-auto">
+                <div class="bg-white border border-slate-100 rounded-[24px] p-5 flex gap-4 shadow-sm hover:shadow-md transition-shadow duration-300">
+                    <div class="w-12 h-12 rounded-xl bg-slate-50 flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-robot text-slate-400 text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base mb-1">СкадаСистемы</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">
+                            Здравствуйте! Чем я могу помочь вам сегодня?
+                        </p>
                     </div>
                 </div>
-
             </div>
-        </section>
+        </div>
     </main>
 
-    <!-- Generic Click Area to Dismiss Keyboard -->
-    <div id="backdrop-click" class="hidden fixed inset-0 z-40 bg-transparent" onclick="blurInput()"></div>
-
-    <!-- Optimized Input Area -->
-    <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-100 p-3 z-50 transition-transform duration-100"
-        id="input-bar">
-        <div class="max-w-xl mx-auto relative flex items-center gap-2">
-            <div
-                class="flex-1 bg-gray-100/80 rounded-xl px-4 py-2.5 transition-all focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20">
-                <input type="text" id="user-input"
-                    class="w-full bg-transparent text-[15px] text-slate-900 placeholder:text-gray-400 outline-none"
-                    placeholder="Введите запрос..." autocomplete="off" onfocus="onInputFocus()" onblur="onInputBlur()">
+    <div id="input-bar" class="fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-xl border-t border-slate-100 p-4 z-50">
+        <div class="max-w-xl mx-auto flex items-center gap-3">
+            <div class="flex-1 bg-slate-50 rounded-2xl px-5 py-3.5 border border-slate-100">
+                <input type="text" 
+                       id="user-input"
+                       class="w-full bg-transparent text-[15px] placeholder:text-slate-400" 
+                       placeholder="Ваш запрос..."
+                       autocomplete="off">
             </div>
-            <button id="send-btn"
-                class="w-11 h-11 rounded-full bg-blue-600 hover:bg-blue-500 active:scale-95 flex items-center justify-center text-white shadow-lg shadow-blue-600/20 transition-all">
-                <i class="fa-solid fa-arrow-up text-sm"></i>
+            <button id="send-btn" class="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white shadow-lg shadow-blue-500/30 active:scale-90 transition-transform duration-150">
+                <i class="fa-solid fa-arrow-up text-lg"></i>
             </button>
         </div>
-        <!-- Safe Area Spacer for iOS Home Bar handled by padding-bottom on container if needed, usually handled by viewport -->
-        <div class="h-[env(safe-area-inset-bottom)]"></div>
     </div>
 
-    <script src="script.js"></script>
     <script>
-        // Smooth Input Handling
         const input = document.getElementById('user-input');
         const inputBar = document.getElementById('input-bar');
-        const backdrop = document.getElementById('backdrop-click');
-        const mainScroll = document.getElementById('main-scroll');
+        const scrollContainer = document.getElementById('scroll-container');
 
-
-        // Prevent iOS zoom
-        const meta = document.querySelector('meta[name="viewport"]');
-        meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
-
-        // Keyboard handling assistance
+        // Умная работа с клавиатурой для плавности
         if (window.visualViewport) {
             window.visualViewport.addEventListener('resize', () => {
-                // Adjust if needed, mainly for non-fixed headers
+                const offset = window.innerHeight - window.visualViewport.height;
+                if (offset > 0) {
+                    // Поднимаем панель ввода
+                    inputBar.style.transform = `translateY(-${offset}px)`;
+                    // Прокручиваем контент
+                    setTimeout(() => {
+                        scrollContainer.scrollTop = scrollContainer.scrollHeight;
+                    }, 50);
+                } else {
+                    inputBar.style.transform = `translateY(0)`;
+                }
             });
         }
 
-        function onInputFocus() {
-            // Show invisible backdrop to catch clicks outside
-            backdrop.classList.remove('hidden');
-            // Scroll to bottom
-            setTimeout(() => {
-                mainScroll.scrollTop = mainScroll.scrollHeight;
-            }, 300);
-        }
-
-        function onInputBlur() {
-            backdrop.classList.add('hidden');
-        }
-
-        function blurInput() {
-            input.blur();
-        }
-
-        function dismissKeyboard(e) {
-            // If clicking on main content while input is focused
-            if (document.activeElement === input) {
-                input.blur();
-            }
-        }
-
-        function sendQuick(text) {
-            const input = document.getElementById('user-input');
-            input.value = text;
-            document.getElementById('send-btn').click();
-        }
-
+        // Telegram WebApp настройки
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
+        window.Telegram.WebApp.setHeaderColor('#374151');
 
-        // Ensure theme color matches
-        window.Telegram.WebApp.setHeaderColor('#0f172a'); // Match slate-900
-        window.Telegram.WebApp.setBackgroundColor('#ffffff');
+        // Плавная анимация появления контента
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.content-card > *').forEach((el, i) => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(10px)';
+                el.style.transition = 'all 0.4s ease-out';
+                setTimeout(() => {
+                    el.style.opacity = '1';
+                    el.style.transform = 'translateY(0)';
+                }, 100 * i);
+            });
+        });
     </script>
 </body>
 
