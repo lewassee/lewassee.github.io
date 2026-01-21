@@ -1,33 +1,33 @@
 <!DOCTYPE html>
-<html lang="ru" class="dark">
+<html lang="ru">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SCADA Systems AI</title>
+    <title>SCADA Systems</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
                         brand: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0ea5e9', // Sky 500
-                            600: '#0284c7', // Sky 600
-                            900: '#0c4a6e', // Sky 900
+                            500: '#007AFF', // Telegram-like blue
+                            600: '#0062CC',
                         },
                         dark: {
-                            bg: '#0f172a', // Slate 900
-                            surface: '#1e293b', // Slate 800
+                            bg: '#182b52', // Deep blue-gray
+                            card: '#243b66',
                         }
                     },
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+                    },
                     animation: {
-                        'fade-in': 'fadeIn 0.5s ease-out',
-                        'slide-up': 'slideUp 0.3s ease-out',
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1)',
+                        'pulse-slow': 'pulse 3s infinite',
                     },
                     keyframes: {
                         fadeIn: {
@@ -35,7 +35,7 @@
                             '100%': { opacity: '1' },
                         },
                         slideUp: {
-                            '0%': { transform: 'translateY(10px)', opacity: '0' },
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
                             '100%': { transform: 'translateY(0)', opacity: '1' },
                         }
                     }
@@ -44,96 +44,204 @@
         }
     </script>
     <style>
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 4px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: #1e293b;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: #475569;
-            border-radius: 2px;
-        }
-
+        /* Modern Gradient Background */
         body {
-            background-color: #0f172a;
-            /* Fallback */
-            color: #f1f5f9;
+            background: radial-gradient(circle at top left, #1d3565, #0f172a 60%);
+            min-height: 100vh;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Glassmorphism Classes */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-header {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Hide Scrollbar but allow scroll */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Smooth Input */
+        .glass-input {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(4px);
+            transition: all 0.2s ease;
+        }
+
+        .glass-input:focus {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: #007AFF;
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
         }
     </style>
 </head>
 
-<body class="bg-dark-bg h-screen flex flex-col antialiased overflow-hidden">
+<body class="flex flex-col h-[var(--tg-viewport-height,100vh)] overflow-hidden">
 
-    <!-- Header -->
+    <!-- Professional Header -->
     <header
-        class="bg-dark-surface/80 backdrop-blur-md border-b border-white/5 px-4 py-3 flex items-center justify-between z-10 sticky top-0 animate-fade-in">
+        class="glass-header px-5 py-4 flex items-center justify-between z-20 absolute top-0 left-0 right-0 animate-fade-in">
         <div class="flex items-center gap-3">
-            <img src="logo-short-white.png" alt="SCADA Systems" class="h-8 w-auto object-contain">
+            <div class="relative">
+                <!-- Using the white logo as requested -->
+                <img src="logo-short-white.png" alt="Logo" class="h-9 w-auto object-contain drop-shadow-md">
+                <!-- Subtle glow check -->
+                <div class="absolute inset-0 bg-blue-500 blur-xl opacity-20 -z-10 rounded-full"></div>
+            </div>
             <div class="flex flex-col">
-                <span class="text-sm font-semibold tracking-wide text-white">Knowledge Base</span>
-                <span class="text-[10px] text-brand-500 uppercase tracking-wider font-bold">AI Assistant</span>
+                <h1 class="text-[17px] font-bold tracking-tight text-white leading-tight">Knowledge Base</h1>
+                <span class="text-[11px] text-blue-400 font-semibold tracking-wider uppercase">AI Assistant v2.0</span>
             </div>
         </div>
-        <div class="flex items-center">
-            <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+
+        <!-- Status Indicator -->
+        <div class="glass-panel px-2.5 py-1 rounded-full flex items-center gap-2">
+            <span class="relative flex h-2 w-2">
+                <span
+                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+            </span>
+            <span class="text-[10px] font-medium text-slate-300">Online</span>
         </div>
     </header>
 
-    <!-- Chat Area -->
-    <main id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth">
-        <!-- AI Welcome Message -->
-        <div class="flex items-start gap-3 animate-slide-up">
-            <div class="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center shrink-0">
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                </svg>
+    <!-- Main Chat Area -->
+    <main id="chat-history"
+        class="flex-1 overflow-y-auto pt-24 pb-24 px-4 space-y-6 no-scrollbar relative z-10 w-full max-w-2xl mx-auto">
+
+        <!-- Decorative Background Blob -->
+        <div
+            class="fixed top-20 left-1/2 -translate-x-1/2 w-[300px] h-[300px] bg-blue-600 rounded-full blur-[100px] opacity-10 pointer-events-none -z-10">
+        </div>
+
+        <!-- Date separator -->
+        <div class="flex justify-center animate-fade-in delay-100">
+            <span class="glass-panel text-[11px] text-slate-400 px-3 py-1 rounded-full">Сегодня</span>
+        </div>
+
+        <!-- Welcome Card (Native-like) -->
+        <div class="animate-slide-up flex flex-col gap-2">
+            <div class="flex items-end gap-2.5">
+                <div
+                    class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shrink-0 shadow-lg shadow-blue-500/20 text-white font-bold text-xs ring-2 ring-white/10">
+                    AI
+                </div>
+                <div class="glass-panel rounded-2xl rounded-bl-none p-4 max-w-[85%] shadow-sm">
+                    <p class="text-[15px] leading-relaxed text-slate-100 font-medium">
+                        👋 Привет! Я интеллектуальный ассистент компании <span
+                            class="text-blue-400 font-bold">СкадаСистемы</span>.
+                    </p>
+                </div>
             </div>
-            <div class="bg-dark-surface border border-white/5 rounded-2xl rounded-tl-none p-3 shadow-lg max-w-[85%]">
-                <p class="text-sm text-slate-200 leading-relaxed">
-                    Привет! Я интеллектуальный помощник <b>SCADA Systems</b>. 🤖
-                    <br><br>
-                    Я знаю всё о нашей технической документации. Спрашивайте меня про контроллеры, настройку ПО или
-                    протоколы связи.
-                </p>
+
+            <!-- Cards Carousel / Recommendations -->
+            <div class="pl-[42px] grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+                <div
+                    class="glass-panel p-3.5 rounded-xl border border-white/5 hover:bg-white/10 active:scale-95 transition-all cursor-pointer group">
+                    <div class="flex items-start gap-3">
+                        <div
+                            class="p-2 bg-blue-500/20 rounded-lg text-blue-400 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253">
+                                </path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-[13px] font-semibold text-white">Документация</div>
+                            <div class="text-[11px] text-slate-400 mt-0.5">Поиск инструкций</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="glass-panel p-3.5 rounded-xl border border-white/5 hover:bg-white/10 active:scale-95 transition-all cursor-pointer group">
+                    <div class="flex items-start gap-3">
+                        <div
+                            class="p-2 bg-purple-500/20 rounded-lg text-purple-400 group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z">
+                                </path>
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="text-[13px] font-semibold text-white">Контроллеры</div>
+                            <div class="text-[11px] text-slate-400 mt-0.5">Подбор оборудования</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-end gap-2.5 mt-2 animate-slide-up" style="animation-delay: 0.1s;">
+                <div class="w-8 h-8 rounded-full bg-transparent shrink-0"></div> <!-- Spacer -->
+                <div class="glass-panel rounded-2xl rounded-tl-none p-4 max-w-[85%]">
+                    <p class="text-[15px] leading-relaxed text-slate-100">
+                        Задайте мне любой технический вопрос, я найду ответ в нашей базе знаний. 📚
+                    </p>
+                </div>
             </div>
         </div>
+
     </main>
 
-    <!-- Input Area -->
-    <footer class="p-4 bg-dark-bg/95 backdrop-blur-sm relative z-20">
-        <!-- Typing Indicator (Hidden by default) -->
-        <div id="typing-indicator"
-            class="absolute -top-8 left-6 text-xs text-brand-500 font-medium hidden flex items-center gap-2">
-            <span>AI печатает...</span>
-            <span class="flex gap-1">
-                <span class="w-1 h-1 bg-brand-500 rounded-full animate-bounce"></span>
-                <span class="w-1 h-1 bg-brand-500 rounded-full animate-bounce delay-100"></span>
-                <span class="w-1 h-1 bg-brand-500 rounded-full animate-bounce delay-200"></span>
-            </span>
-        </div>
-
-        <div class="relative flex items-center gap-2 animate-fade-in">
-            <input type="text" id="user-input"
-                class="w-full bg-dark-surface border border-white/10 text-white text-sm rounded-xl pl-4 pr-12 py-3.5 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition-all placeholder-slate-500 shadow-inner"
-                placeholder="Задайте ваш вопрос..." autocomplete="off">
-
+    <!-- Native-like Input Bar -->
+    <footer class="fixed bottom-0 left-0 right-0 glass-header border-t-0 p-3 pt-2 pb-safe-area z-20">
+        <div class="w-full max-w-2xl mx-auto flex items-end gap-2">
+            <div
+                class="flex-1 bg-slate-900/50 rounded-2xl p-1.5 ring-1 ring-white/10 focus-within:ring-blue-500/50 transition-all">
+                <textarea id="user-input" rows="1"
+                    class="w-full bg-transparent text-white text-[15px] px-3.5 py-2.5 max-h-24 focus:outline-none placeholder-slate-500 resize-none selection:bg-blue-500/30"
+                    placeholder="Ваш вопрос..."></textarea>
+            </div>
             <button id="send-btn"
-                class="absolute right-2 p-2 bg-brand-600 hover:bg-brand-500 text-white rounded-lg transition-colors shadow-lg shadow-brand-500/20 active:scale-95">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M22 2L11 13"></path>
-                    <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
+                class="mb-1.5 w-11 h-11 bg-blue-600 rounded-full flex items-center justify-center text-white shadow-lg shadow-blue-600/30 active:scale-90 transition-transform hover:bg-blue-500">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round" class="ml-0.5">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
                 </svg>
             </button>
         </div>
+        <div class="text-center mt-2">
+            <span class="text-[10px] text-slate-500 font-medium">Power by SCADA Systems AI</span>
+        </div>
     </footer>
 
+    <!-- Scripts -->
     <script src="script.js"></script>
+    <script>
+        // Auto-resize textarea
+        const textarea = document.getElementById('user-input');
+        textarea.addEventListener('input', function () {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+            if (this.value === '') this.style.height = 'auto';
+        });
+
+        // Initialize Telegram WebApp
+        window.Telegram.WebApp.ready();
+        window.Telegram.WebApp.expand(); // Use full height
+    </script>
 </body>
 
 </html>
