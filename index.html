@@ -1,242 +1,530 @@
 <!DOCTYPE html>
 <html lang="ru">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>ScadaHelpBot</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
     <style>
-        :root {
-            --vh: 100vh;
-        }
-
         * {
             -webkit-tap-highlight-color: transparent;
             box-sizing: border-box;
-            user-select: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+            position: fixed;
+            width: 100%;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: #374151;
-            margin: 0;
-            height: var(--vh);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #5a6270;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Шапка */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: linear-gradient(180deg, rgba(90, 98, 112, 0.95) 0%, rgba(90, 98, 112, 0.85) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: max(env(safe-area-inset-top), 12px) 20px 12px;
+        }
+
+        .logo {
+            height: 28px;
+            width: auto;
+        }
+
+        /* Основной контейнер */
+        .main-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            flex-direction: column;
+            padding-top: calc(52px + max(env(safe-area-inset-top), 12px));
+        }
+
+        /* Градиентная зона */
+        .hero-section {
+            background: linear-gradient(180deg, #5a6270 0%, #6b7280 40%, #9ca3af 100%);
+            padding: 40px 24px 50px;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: clamp(28px, 7vw, 34px);
+            font-weight: 700;
+            color: white;
+            line-height: 1.15;
+            margin-bottom: 16px;
+            letter-spacing: -0.02em;
+        }
+
+        .hero-description {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.65);
+            line-height: 1.5;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        /* Белая карточка */
+        .content-wrapper {
+            flex: 1;
+            background: white;
+            border-radius: 32px 32px 0 0;
+            margin-top: -24px;
+            position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
 
-        /* Эффект экстремально жидкого стекла */
-        .liquid-glass {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(25px) saturate(180%);
-            -webkit-backdrop-filter: blur(25px) saturate(180%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
-        }
-
-        .hero-gradient {
-            background: linear-gradient(180deg, #323844 0%, #4b5563 50%, #9ca3af 100%);
+        .content-scroll {
             flex: 1;
-            display: flex;
-            flex-direction: column;
             overflow-y: auto;
-            scroll-behavior: smooth;
-            padding-top: env(safe-area-inset-top);
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+            padding: 28px 20px 20px;
         }
 
-        .hero-gradient::-webkit-scrollbar { display: none; }
-
-        /* Белая карта с мягким переходом */
-        .content-card {
-            background: #ffffff;
-            border-top-left-radius: 42px;
-            border-top-right-radius: 42px;
-            padding: 32px 24px 140px;
-            margin-top: -30px;
-            min-height: 70vh;
-            box-shadow: 0 -20px 40px rgba(0, 0, 0, 0.15);
-            z-index: 5;
+        .content-scroll::-webkit-scrollbar {
+            display: none;
         }
 
         /* Табы */
         .tabs {
-            background: #f4f6f9;
+            background: #f1f5f9;
             border-radius: 100px;
-            padding: 5px;
+            padding: 4px;
             display: flex;
-            gap: 2px;
-            margin-bottom: 24px;
+            gap: 4px;
+            margin-bottom: 28px;
+            max-width: 380px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .tab {
             flex: 1;
-            padding: 10px;
+            padding: 12px 16px;
             font-size: 14px;
             font-weight: 600;
             border-radius: 100px;
             text-align: center;
-            color: #94a3b8;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #64748b;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            white-space: nowrap;
         }
 
         .tab.active {
-            background: #fff;
+            background: white;
             color: #1e293b;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
         }
 
-        /* Нижняя панель */
-        .input-area {
+        /* Карточка сообщения */
+        .message-card {
+            background: white;
+            border: 1px solid #f1f5f9;
+            border-radius: 24px;
+            padding: 20px;
+            display: flex;
+            gap: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .bot-avatar {
+            width: 52px;
+            height: 52px;
+            background: #f8fafc;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .bot-avatar i {
+            font-size: 26px;
+            color: #cbd5e1;
+        }
+
+        .message-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .message-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .message-text {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.5;
+        }
+
+        /* Нижняя панель ввода */
+        .input-panel {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            padding: 16px 20px calc(12px + env(safe-area-inset-bottom));
-            z-index: 100;
-            will-change: transform;
-            transition: transform 0.15s ease-out; /* Ускорили для плавности клавиатуры */
+            border-top: 1px solid #f1f5f9;
+            padding: 12px 16px;
+            padding-bottom: calc(12px + env(safe-area-inset-bottom));
+            z-index: 90;
+            transition: transform 0.2s ease-out;
+        }
+
+        .input-wrapper {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .input-field {
-            background: #f1f5f9;
-            border-radius: 20px;
-            padding: 14px 20px;
             flex: 1;
-            font-size: 16px;
-            border: 1px solid rgba(0, 0, 0, 0.02);
+            background: #f1f5f9;
+            border: none;
+            border-radius: 24px;
+            padding: 14px 20px;
+            font-size: 15px;
+            color: #1e293b;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            transition: background 0.2s;
         }
 
-        .send-btn {
-            width: 50px;
-            height: 50px;
-            background: #2563eb;
+        .input-field:focus {
+            background: #e2e8f0;
+        }
+
+        .input-field::placeholder {
+            color: #94a3b8;
+        }
+
+        .send-button {
+            width: 48px;
+            height: 48px;
+            background: #3b82f6;
+            border: none;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            flex-shrink: 0;
         }
 
-        /* Анимация плавного появления */
-        .animate-reveal {
-            animation: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        .send-button:active {
+            transform: scale(0.92);
         }
 
-        @keyframes reveal {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+        .send-button i {
+            font-size: 18px;
+        }
+
+        .bot-label {
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        .bot-label span {
+            font-size: 9px;
+            font-weight: 700;
+            color: #cbd5e1;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 360px) {
+            .hero-title {
+                font-size: 26px;
+            }
+            
+            .hero-description {
+                font-size: 14px;
+            }
+            
+            .tab {
+                font-size: 13px;
+                padding: 10px 12px;
+            }
+
+            .message-card {
+                padding: 16px;
+                gap: 12px;
+            }
+
+            .bot-avatar {
+                width: 48px;
+                height: 48px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .main-container {
+                max-width: 600px;
+                margin: 0 auto;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
+
+        /* Анимации появления */
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-delay {
+            animation: fadeIn 0.6s ease-out 0.15s both;
         }
     </style>
 </head>
-
 <body>
-
-    <header class="fixed top-0 left-0 right-0 z-[110] liquid-glass">
-        <div class="flex items-center justify-between px-6 py-4">
-            <img src="logo-short-white.png" alt="Logo" class="h-6 w-auto opacity-90">
-            <div class="flex items-center gap-4">
-                <span class="text-[11px] font-bold text-white/40 uppercase tracking-[0.2em]">Чат-бот</span>
-                <button class="text-white/80"><i class="fa-solid fa-bars-staggered text-xl"></i></button>
-            </div>
-        </div>
+    <!-- Шапка -->
+    <header class="header">
+        <img src="logo-short-white.png" alt="ScadaHelpBot" class="logo" onerror="this.style.display='none'">
     </header>
 
-    <div class="hero-gradient" id="scroll-wrapper">
-        <div class="pt-32 pb-16 text-center px-8 animate-reveal">
-            <h1 class="text-[32px] font-bold text-white leading-[1.1] mb-6 tracking-tight">
+    <!-- Основной контейнер -->
+    <div class="main-container">
+        <!-- Герой секция -->
+        <div class="hero-section fade-in">
+            <h1 class="hero-title">
                 Интеллектуальный<br>цифровой помощник
             </h1>
-            <p class="text-[15px] text-white/60 max-w-[280px] mx-auto leading-relaxed">
+            <p class="hero-description">
                 Отвечу на вопросы по оборудованию и ПО, подберу документацию.
             </p>
         </div>
 
-        <main class="content-card">
-            <div class="tabs max-w-sm mx-auto animate-reveal" style="animation-delay: 0.1s;">
-                <div class="tab active">Оборудование</div>
-                <div class="tab">Документация</div>
-            </div>
+        <!-- Контент -->
+        <div class="content-wrapper">
+            <div class="content-scroll" id="contentScroll">
+                <!-- Табы -->
+                <div class="tabs fade-in-delay">
+                    <div class="tab active">Оборудование</div>
+                    <div class="tab">Документация</div>
+                </div>
 
-            <div class="max-w-md mx-auto animate-reveal" style="animation-delay: 0.2s;">
-                <div class="bg-white border border-slate-50 rounded-[32px] p-6 flex gap-5 shadow-[0_15px_40px_rgba(0,0,0,0.03)]">
-                    <div class="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-robot text-slate-300 text-2xl"></i>
+                <!-- Карточка бота -->
+                <div class="message-card fade-in-delay">
+                    <div class="bot-avatar">
+                        <i class="fa-solid fa-robot"></i>
                     </div>
-                    <div class="flex flex-col justify-center">
-                        <h3 class="font-bold text-slate-900 text-[17px]">СкадаСистемы</h3>
-                        <p class="text-[15px] text-slate-500 mt-1">Здравствуйте! Чем я могу помочь сегодня?</p>
+                    <div class="message-content">
+                        <div class="message-title">СкадаСистемы</div>
+                        <div class="message-text">Здравствуйте! Чем я могу помочь вам сегодня?</div>
                     </div>
                 </div>
             </div>
-        </main>
+        </div>
     </div>
 
-    <div class="input-area" id="input-container">
-        <div class="max-w-xl mx-auto flex items-center gap-3">
-            <input type="text" 
-                   id="chat-input"
-                   class="input-field outline-none" 
-                   placeholder="Ваш запрос..." 
-                   autocomplete="off">
-            <button class="send-btn active:scale-90 transition-transform">
-                <i class="fa-solid fa-arrow-up text-lg"></i>
+    <!-- Панель ввода -->
+    <div class="input-panel" id="inputPanel">
+        <div class="input-wrapper">
+            <input 
+                type="text" 
+                id="chatInput"
+                class="input-field" 
+                placeholder="Ваш запрос..."
+                autocomplete="off"
+                autocorrect="off"
+                autocapitalize="off"
+                spellcheck="false"
+            >
+            <button class="send-button" id="sendButton">
+                <i class="fa-solid fa-arrow-up"></i>
             </button>
         </div>
-        <div class="text-center mt-4 pb-1">
-            <span class="text-[9px] text-slate-300 font-bold uppercase tracking-[0.3em]">@SCADAHELPBOT</span>
+        <div class="bot-label">
+            <span>@ScadaHelpBot</span>
         </div>
     </div>
 
     <script>
-        const inputContainer = document.getElementById('input-container');
-        const scrollWrapper = document.getElementById('scroll-wrapper');
-        const input = document.getElementById('chat-input');
-
-        // Динамическое обновление высоты для Telegram
-        function updateHeight() {
-            document.documentElement.style.setProperty('--vh', `${window.innerHeight}px`);
+        // Инициализация Telegram WebApp
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.ready();
+            tg.expand();
+            tg.setHeaderColor('#5a6270');
+            tg.setBackgroundColor('#ffffff');
+            tg.disableVerticalSwipes();
         }
 
-        // Плавная обработка клавиатуры без наезжания
+        // Элементы
+        const inputPanel = document.getElementById('inputPanel');
+        const chatInput = document.getElementById('chatInput');
+        const sendButton = document.getElementById('sendButton');
+        const contentScroll = document.getElementById('contentScroll');
+
+        // Обработка клавиатуры для плавности
+        let keyboardHeight = 0;
+        let isKeyboardOpen = false;
+
         if (window.visualViewport) {
-            window.visualViewport.addEventListener('resize', () => {
-                const height = window.visualViewport.height;
-                const totalHeight = window.innerHeight;
-                const diff = totalHeight - height;
-
-                if (diff > 50) {
-                    // Клавиатура открыта
-                    inputContainer.style.transform = `translateY(-${diff}px)`;
-                    // Прокручиваем контент так, чтобы активный элемент был виден
-                    setTimeout(() => {
-                        scrollWrapper.scrollBy({ top: 150, behavior: 'smooth' });
-                    }, 100);
-                } else {
-                    // Клавиатура закрыта
-                    inputContainer.style.transform = `translateY(0)`;
-                }
-            });
+            const viewport = window.visualViewport;
+            
+            viewport.addEventListener('resize', handleViewportResize);
+            viewport.addEventListener('scroll', handleViewportScroll);
         }
 
-        window.addEventListener('resize', updateHeight);
-        updateHeight();
+        function handleViewportResize() {
+            const viewport = window.visualViewport;
+            const windowHeight = window.innerHeight;
+            const viewportHeight = viewport.height;
+            const diff = windowHeight - viewportHeight;
 
-        // Telegram WebApp Config
-        window.Telegram.WebApp.ready();
-        window.Telegram.WebApp.expand();
-        window.Telegram.WebApp.setHeaderColor('#323844');
-        window.Telegram.WebApp.setBackgroundColor('#ffffff');
+            if (diff > 100) {
+                // Клавиатура открыта
+                if (!isKeyboardOpen) {
+                    isKeyboardOpen = true;
+                    keyboardHeight = diff;
+                    
+                    // Плавно поднимаем панель ввода
+                    requestAnimationFrame(() => {
+                        inputPanel.style.transform = `translateY(-${keyboardHeight}px)`;
+                        
+                        // Скроллим контент вверх
+                        setTimeout(() => {
+                            contentScroll.scrollTo({
+                                top: contentScroll.scrollHeight,
+                                behavior: 'smooth'
+                            });
+                        }, 100);
+                    });
+                }
+            } else {
+                // Клавиатура закрыта
+                if (isKeyboardOpen) {
+                    isKeyboardOpen = false;
+                    keyboardHeight = 0;
+                    
+                    requestAnimationFrame(() => {
+                        inputPanel.style.transform = 'translateY(0)';
+                    });
+                }
+            }
+        }
+
+        function handleViewportScroll() {
+            // Предотвращаем скролл viewport при открытой клавиатуре
+            if (isKeyboardOpen && window.visualViewport) {
+                window.scrollTo(0, 0);
+            }
+        }
+
+        // Фокус на input
+        chatInput.addEventListener('focus', () => {
+            setTimeout(() => {
+                if (contentScroll) {
+                    contentScroll.scrollTo({
+                        top: contentScroll.scrollHeight,
+                        behavior: 'smooth'
+                    });
+                }
+            }, 300);
+        });
+
+        // Отправка сообщения
+        function sendMessage() {
+            const text = chatInput.value.trim();
+            if (text) {
+                console.log('Отправка:', text);
+                chatInput.value = '';
+                chatInput.blur();
+            }
+        }
+
+        sendButton.addEventListener('click', sendMessage);
+        
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Табы
+        const tabs = document.querySelectorAll('.tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Предотвращение pull-to-refresh
+        document.body.addEventListener('touchmove', (e) => {
+            if (contentScroll.scrollTop === 0 && e.touches[0].clientY > e.touches[0].clientY) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Фикс для iOS Safari - предотвращаем bounce эффект
+        let touchStartY = 0;
+        document.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            const touchY = e.touches[0].clientY;
+            const touchDiff = touchY - touchStartY;
+            
+            if (contentScroll.scrollTop === 0 && touchDiff > 0) {
+                e.preventDefault();
+            }
+        }, { passive: false });
     </script>
 </body>
-
 </html>
