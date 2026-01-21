@@ -105,15 +105,12 @@
     <!-- Main Content Area -->
     <main class="flex-1 overflow-y-auto relative w-full pb-20 no-scrollbar" id="main-scroll">
 
-        <!-- Hero Section (Neutral Background Everywhere) -->
-        <section class="relative h-[45vh] min-h-[350px] w-full flex items-center justify-center">
+        <!-- Hero Section (Metallic Gray Gradient - No Image) -->
+        <section
+            class="relative h-[45vh] min-h-[350px] w-full flex items-center justify-center bg-gradient-to-b from-slate-700 via-gray-400 to-white">
             <div class="absolute inset-0 z-0">
-                <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
-                    alt="Factory" class="w-full h-full object-cover opacity-80">
-                <!-- Heavy Overlay to ensure neutrality -->
-                <div class="absolute inset-0 bg-slate-900/80 mix-blend-multiply"></div>
-                <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
-                <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white to-transparent opacity-90">
+                <!-- No Image - Just Gradient -->
+                <div class="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent opacity-90">
                 </div>
             </div>
 
@@ -131,14 +128,15 @@
                 </h1>
 
                 <p
-                    class="text-sm text-gray-300 max-w-xs mx-auto leading-relaxed animate-fade-in-up delay-200 font-medium">
+                    class="text-sm text-white/90 max-w-xs mx-auto leading-relaxed animate-fade-in-up delay-200 font-medium drop-shadow-md">
                     Отвечу на вопросы по оборудованию и ПО.
                 </p>
             </div>
         </section>
 
         <!-- Content Section (Merged) -->
-        <section class="relative bg-white -mt-8 rounded-t-[2.5rem] z-20 px-4 pt-10 pb-6 min-h-[50vh]">
+        <section class="relative bg-white -mt-8 rounded-t-[2.5rem] z-20 px-4 pt-10 pb-6 min-h-[50vh]"
+            onclick="dismissKeyboard(event)">
             <!-- Decorative Line -->
             <div class="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-8"></div>
 
@@ -169,6 +167,9 @@
         </section>
     </main>
 
+    <!-- Generic Click Area to Dismiss Keyboard -->
+    <div id="backdrop-click" class="hidden fixed inset-0 z-40 bg-transparent" onclick="blurInput()"></div>
+
     <!-- Optimized Input Area -->
     <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-100 p-3 z-50 transition-transform duration-100"
         id="input-bar">
@@ -177,7 +178,7 @@
                 class="flex-1 bg-gray-100/80 rounded-xl px-4 py-2.5 transition-all focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20">
                 <input type="text" id="user-input"
                     class="w-full bg-transparent text-[15px] text-slate-900 placeholder:text-gray-400 outline-none"
-                    placeholder="Введите запрос..." autocomplete="off">
+                    placeholder="Введите запрос..." autocomplete="off" onfocus="onInputFocus()" onblur="onInputBlur()">
             </div>
             <button id="send-btn"
                 class="w-11 h-11 rounded-full bg-blue-600 hover:bg-blue-500 active:scale-95 flex items-center justify-center text-white shadow-lg shadow-blue-600/20 transition-all">
@@ -193,6 +194,9 @@
         // Smooth Input Handling
         const input = document.getElementById('user-input');
         const inputBar = document.getElementById('input-bar');
+        const backdrop = document.getElementById('backdrop-click');
+        const mainScroll = document.getElementById('main-scroll');
+
 
         // Prevent iOS zoom
         const meta = document.querySelector('meta[name="viewport"]');
@@ -203,6 +207,30 @@
             window.visualViewport.addEventListener('resize', () => {
                 // Adjust if needed, mainly for non-fixed headers
             });
+        }
+
+        function onInputFocus() {
+            // Show invisible backdrop to catch clicks outside
+            backdrop.classList.remove('hidden');
+            // Scroll to bottom
+            setTimeout(() => {
+                mainScroll.scrollTop = mainScroll.scrollHeight;
+            }, 300);
+        }
+
+        function onInputBlur() {
+            backdrop.classList.add('hidden');
+        }
+
+        function blurInput() {
+            input.blur();
+        }
+
+        function dismissKeyboard(e) {
+            // If clicking on main content while input is focused
+            if (document.activeElement === input) {
+                input.blur();
+            }
         }
 
         function sendQuick(text) {
