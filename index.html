@@ -28,6 +28,7 @@
                             500: '#0ea5e9',
                         },
                         slate: {
+                            850: '#1e293b', // Custom dark
                             900: '#0f172a',
                         }
                     },
@@ -37,12 +38,12 @@
                             '100%': { transform: 'translateX(100%)' }
                         },
                         'fade-in-up': {
-                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
                             '100%': { opacity: '1', transform: 'translateY(0)' },
                         }
                     },
                     animation: {
-                        'fade-in-up': 'fade-in-up 0.6s ease-out forwards',
+                        'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
                     }
                 }
             }
@@ -52,114 +53,114 @@
         body {
             font-family: 'Inter', sans-serif;
             background-color: #ffffff;
+            overscroll-behavior: none;
         }
 
         ::-webkit-scrollbar {
             display: none;
         }
+
+        /* Fix IOS Input Zoom & Scroll */
+        input,
+        textarea,
+        button,
+        select,
+        a {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Smoother transitions */
+        .smooth-transition {
+            will-change: transform, opacity;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
     </style>
 </head>
 
-<body class="bg-white min-h-screen relative selection:bg-blue-200">
+<body class="bg-white min-h-[100dvh] relative selection:bg-blue-200 overflow-hidden flex flex-col">
 
-    <!-- Header (Pixel Perfect Replica) -->
-    <header
-        class="fixed top-4 left-1/2 -translate-x-1/2 w-[98%] max-w-[1400px] z-50 transition-all duration-500 ease-in-out">
+    <!-- Compact Header (No Icons, Minimized) -->
+    <header class="fixed top-3 left-1/2 -translate-x-1/2 w-[95%] max-w-[600px] z-50">
         <div
-            class="relative group rounded-full border border-white/20 bg-slate-900/40 backdrop-blur-md shadow-lg overflow-hidden">
-
-            <!-- Liquid shine effect -->
+            class="relative group rounded-2xl border border-white/10 bg-slate-900/80 backdrop-blur-xl shadow-lg overflow-hidden">
+            <!-- Subtle shimmer -->
             <div
-                class="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent z-0 pointer-events-none">
+                class="absolute inset-0 -translate-x-full group-hover:animate-[shimmer_3s_infinite] bg-gradient-to-r from-transparent via-white/5 to-transparent z-0 pointer-events-none">
             </div>
 
-            <div class="relative z-10 px-4 py-2 flex items-center justify-between text-white">
+            <div class="relative z-10 px-4 py-2.5 flex items-center justify-between text-white">
                 <!-- Logo -->
-                <div class="flex items-center gap-2 cursor-pointer mr-4">
-                    <img src="logo-short-white.png" alt="СкадаСистемы" class="h-6 w-auto object-contain">
-                    <!-- Removed invert since logo-short-white.png is already white/suitable for dark bg -->
+                <div class="flex items-center gap-2">
+                    <img src="logo-short-white.png" alt="СкадаСистемы" class="h-5 w-auto object-contain">
                 </div>
 
-                <!-- Icons (Phone, Search, Globe, Menu) -->
-                <div class="flex items-center gap-4 border-l border-white/10 pl-4 ml-auto">
-                    <a href="#" class="text-white/70 hover:text-white transition-colors"><i
-                            class="fa-solid fa-phone text-xs"></i></a>
-                    <button class="text-white/70 hover:text-white transition-colors"><i
-                            class="fa-solid fa-magnifying-glass text-xs"></i></button>
-                    <button class="text-white/70 hover:text-white transition-colors"><i
-                            class="fa-solid fa-globe text-xs"></i></button>
-                    <button class="text-white text-sm"><i class="fa-solid fa-bars"></i></button>
-                </div>
+                <!-- Simple Menu Icon Only -->
+                <button class="text-white/80 hover:text-white transition-colors">
+                    <i class="fa-solid fa-bars text-sm"></i>
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="transition-all duration-700 ease-out">
+    <!-- Main Content Area -->
+    <main class="flex-1 overflow-y-auto relative w-full pb-20 no-scrollbar" id="main-scroll">
 
-        <!-- Hero Section -->
-        <section class="relative h-[60vh] min-h-[400px] w-full overflow-hidden flex items-center">
-            <div class="absolute inset-0">
+        <!-- Hero Section (Neutral Background Everywhere) -->
+        <section class="relative h-[45vh] min-h-[350px] w-full flex items-center justify-center">
+            <div class="absolute inset-0 z-0">
                 <img src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
-                    alt="Factory" class="w-full h-full object-cover">
-                <div class="absolute inset-0 bg-slate-900/60"></div>
-                <!-- Gradient Fade -->
-                <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-white to-transparent"></div>
+                    alt="Factory" class="w-full h-full object-cover opacity-80">
+                <!-- Heavy Overlay to ensure neutrality -->
+                <div class="absolute inset-0 bg-slate-900/80 mix-blend-multiply"></div>
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/60 to-transparent"></div>
+                <div class="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white to-transparent opacity-90">
+                </div>
             </div>
 
-            <div
-                class="relative z-10 container mx-auto px-6 flex flex-col items-center justify-center text-center max-w-5xl mt-8">
-                <!-- Breadcrumbs Visual -->
+            <div class="relative z-10 container px-6 text-center mt-8">
+                <!-- Breadcrumbs: Just Chat-Bot -->
                 <div
-                    class="mb-6 flex items-center gap-2 text-white/70 text-[10px] font-medium uppercase tracking-wider animate-fade-in-up">
-                    <span>Главная</span>
-                    <i class="fa-solid fa-chevron-right text-[8px] opacity-50"></i>
-                    <span class="text-white border-b border-white/30 pb-0.5">Чат-Бот</span>
+                    class="mb-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md border border-white/10 mx-auto animate-fade-in-up">
+                    <span
+                        class="text-white/90 text-[10px] font-bold uppercase tracking-widest text shadow-sm">Чат-Бот</span>
                 </div>
 
                 <h1
-                    class="text-2xl md:text-4xl font-bold text-white leading-tight mb-4 animate-fade-in-up delay-100 drop-shadow-lg">
+                    class="text-3xl font-bold text-white leading-tight mb-3 animate-fade-in-up delay-100 drop-shadow-xl tracking-tight">
                     Интеллектуальный<br>цифровой помощник
                 </h1>
 
-                <p class="text-sm text-gray-200 max-w-md leading-relaxed animate-fade-in-up delay-200">
-                    Отвечу на вопросы по оборудованию и ПО, подберу документацию.
+                <p
+                    class="text-sm text-gray-300 max-w-xs mx-auto leading-relaxed animate-fade-in-up delay-200 font-medium">
+                    Отвечу на вопросы по оборудованию и ПО.
                 </p>
             </div>
         </section>
 
-        <!-- Content Section (Rounded Top) -->
-        <section class="py-10 bg-white relative -mt-10 rounded-t-[3rem] z-20 min-h-[50vh]">
-            <div class="container mx-auto px-4">
+        <!-- Content Section (Merged) -->
+        <section class="relative bg-white -mt-8 rounded-t-[2.5rem] z-20 px-4 pt-10 pb-6 min-h-[50vh]">
+            <!-- Decorative Line -->
+            <div class="w-12 h-1 bg-gray-200 rounded-full mx-auto mb-8"></div>
 
-                <!-- Quick Actions / Features -->
-                <div class="flex justify-center mb-8">
-                    <div class="flex items-center space-x-1 rounded-full bg-gray-100 p-1 shadow-inner">
-                        <button onclick="sendQuick('Оборудование')"
-                            class="px-6 py-2 rounded-full text-xs font-bold bg-white text-slate-900 shadow-sm ring-1 ring-black/5 transition-all outline-none">
-                            Оборудование
-                        </button>
-                        <button onclick="sendQuick('Документация')"
-                            class="px-6 py-2 rounded-full text-xs font-bold text-gray-500 hover:text-slate-900 transition-all outline-none">
-                            Документация
-                        </button>
-                    </div>
+            <div class="max-w-xl mx-auto space-y-6">
+
+                <!-- Single Section Title -->
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="h-8 w-1 bg-blue-600 rounded-full"></div>
+                    <h2 class="text-lg font-bold text-slate-900">База знаний</h2>
                 </div>
 
                 <!-- Chat Area -->
-                <div id="messages-container" class="space-y-4 mb-20 max-w-xl mx-auto">
+                <div id="messages-container" class="space-y-4">
                     <!-- AI Message -->
-                    <div
-                        class="flex items-start gap-4 animate-fade-in-up border border-gray-100 p-4 rounded-2xl shadow-lg shadow-blue-900/5 bg-white">
+                    <div class="flex items-start gap-3 animate-fade-in-up">
                         <div
-                            class="w-10 h-10 rounded-lg bg-gray-100 flex items-center justify-center shrink-0 text-gray-400">
-                            <i class="fa-solid fa-robot text-lg"></i>
+                            class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center shrink-0 shadow-lg shadow-blue-600/20 text-white">
+                            <i class="fa-solid fa-robot text-xs"></i>
                         </div>
-                        <div>
-                            <h3 class="text-sm font-bold text-gray-900 mb-1">СкадаСистемы</h3>
-                            <p class="text-xs text-gray-500 leading-relaxed">
-                                Здравствуйте! Чем я могу помочь вам сегодня?
-                            </p>
+                        <div
+                            class="bg-gray-50 border border-gray-100 p-4 rounded-2xl rounded-tl-none shadow-sm text-sm text-slate-700 leading-relaxed max-w-[85%]">
+                            Здравствуйте! Я готов помочь вам с подбором решений.
                         </div>
                     </div>
                 </div>
@@ -168,31 +169,54 @@
         </section>
     </main>
 
-    <!-- Native Input Fixed Bottom -->
-    <div class="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-3 pb-safe-area z-50">
-        <div class="max-w-xl mx-auto relative">
+    <!-- Optimized Input Area -->
+    <div class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-gray-100 p-3 z-50 transition-transform duration-100"
+        id="input-bar">
+        <div class="max-w-xl mx-auto relative flex items-center gap-2">
             <div
-                class="bg-gray-50 flex items-center gap-3 p-3 rounded-2xl border border-gray-100 focus-within:border-blue-500/30 focus-within:shadow-md transition-all">
+                class="flex-1 bg-gray-100/80 rounded-xl px-4 py-2.5 transition-all focus-within:bg-white focus-within:ring-2 focus-within:ring-blue-500/20">
                 <input type="text" id="user-input"
-                    class="bg-transparent flex-1 text-sm text-slate-900 placeholder:text-gray-400 outline-none"
-                    placeholder="Ваш запрос...">
-                <button id="send-btn"
-                    class="w-8 h-8 rounded-full bg-blue-600 hover:bg-blue-500 flex items-center justify-center text-white shadow-lg shadow-blue-600/20 transition-all">
-                    <i class="fa-solid fa-arrow-up text-xs"></i>
-                </button>
+                    class="w-full bg-transparent text-[15px] text-slate-900 placeholder:text-gray-400 outline-none"
+                    placeholder="Введите запрос..." autocomplete="off">
             </div>
+            <button id="send-btn"
+                class="w-11 h-11 rounded-full bg-blue-600 hover:bg-blue-500 active:scale-95 flex items-center justify-center text-white shadow-lg shadow-blue-600/20 transition-all">
+                <i class="fa-solid fa-arrow-up text-sm"></i>
+            </button>
         </div>
+        <!-- Safe Area Spacer for iOS Home Bar handled by padding-bottom on container if needed, usually handled by viewport -->
+        <div class="h-[env(safe-area-inset-bottom)]"></div>
     </div>
 
     <script src="script.js"></script>
     <script>
+        // Smooth Input Handling
+        const input = document.getElementById('user-input');
+        const inputBar = document.getElementById('input-bar');
+
+        // Prevent iOS zoom
+        const meta = document.querySelector('meta[name="viewport"]');
+        meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+
+        // Keyboard handling assistance
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', () => {
+                // Adjust if needed, mainly for non-fixed headers
+            });
+        }
+
         function sendQuick(text) {
             const input = document.getElementById('user-input');
             input.value = text;
             document.getElementById('send-btn').click();
         }
+
         window.Telegram.WebApp.ready();
         window.Telegram.WebApp.expand();
+
+        // Ensure theme color matches
+        window.Telegram.WebApp.setHeaderColor('#0f172a'); // Match slate-900
+        window.Telegram.WebApp.setBackgroundColor('#ffffff');
     </script>
 </body>
 
